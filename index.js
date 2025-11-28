@@ -30,17 +30,38 @@ async function run() {
     const productcollection=db.collection("products")
 
 
-    app.get('/products', async(req,res)=>{
-        try{
-            const products=productcollection.find();
-            const result=await products.toArray();
-            res.send(result)
-        }
+    // app.get('/products', async(req,res)=>{
+    //     try{
+    //         const products=productcollection.find();
+    //         const result=await products.toArray();
+    //         res.send(result)
+    //     }
         
-        catch (err){
-            console.log(err);
-            res.status(500).json({error: "Internal server error"})
-        }
+    //     catch (err){
+    //         console.log(err);
+    //         res.status(500).json({error: "Internal server error"})
+    //     }
+    // })
+
+
+    app.get("/products",async(req,res)=>{
+      try{
+      const search=req.query.search || "";
+
+      let filter={};
+
+
+      if(search){filter={
+        name:{$regex:search, $options: "i"}
+      }}
+
+      const result=await productcollection.find(filter).toArray();
+      res.send(result);
+      }
+      catch(err){
+        console.log(err);
+        res.status(500).json({error:"Internal server error"})
+      }
     })
 
 
