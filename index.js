@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = process.env.MONGO_URI;
 
 
@@ -63,6 +63,23 @@ async function run() {
         res.status(500).json({error:"Internal server error"})
       }
     })
+
+    app.get("/product-detels/:id",async(req,res)=>{
+      try{
+        const id=req.params.id;
+        const product=await productcollection.findOne({_id:new ObjectId(id)})
+        if(!product){
+          return res.status(404).json({error:"product not found"});
+        }
+        res.send(product);
+      }
+      catch
+       ( err){
+          console.log(err)
+          res.status(500).json({error:"Internal server error"})
+        }
+      
+    });
 
 
     await client.db("admin").command({ ping: 1 });
