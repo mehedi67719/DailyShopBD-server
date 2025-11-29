@@ -28,6 +28,8 @@ async function run() {
     await client.connect();
     const db =client.db("dailyshop");
     const productcollection=db.collection("products")
+    const categoriecollection=db.collection("categories")
+    const cartcollection=db.collection("cart")
 
 
     // app.get('/products', async(req,res)=>{
@@ -44,9 +46,37 @@ async function run() {
     // })
 
 
+    app.get('/categories',async(req,res)=>{
+      try{
+        const categorie=await categoriecollection.find();
+        const result=await categorie.toArray();
+        res.send(result)
+      }
+      catch(err){
+        console.log(err);
+        res.status(500).json({error:"Internal server error"})
+      }
+    })
+    
+
+    app.post("cart",async(req,res)=>{
+      try{
+        const cart=req.body;
+        const addcart=await cartcollection.insertOne(cart);
+        res.status(201).json({ message: "Product added"})
+      }
+      catch(err){
+        res.status(500).json({error:err.message })
+      }
+    })
+
+
     app.get("/products",async(req,res)=>{
       try{
       const search=req.query.search || "";
+        const page=parseInt(req.query.page)|| 1;
+        const limit=parseInt(req.query.limit)|| 8;
+        const skip=(page-1)*limit
 
       let filter={};
 
@@ -55,8 +85,22 @@ async function run() {
         name:{$regex:search, $options: "i"}
       }}
 
-      const result=await productcollection.find(filter).toArray();
-      res.send(result);
+      const totalproducts=await productcollection.countDocuments(filter);
+      const totalpages=Math.ceil(totalproducts/limit)
+      const products=await productcollection.find(filter).skip(skip).limit(limit).toArray();
+      res.send({products,totalpages,totalproducts, currentPage: page});
+      }
+      catch(err){
+        console.log(err);
+        res.status(500).json({error:"Internal server error"})
+      }
+    })
+
+
+    app.get("/top-rated-products",async(req,res)=>{
+      try{
+        const products=await productcollection.find().sort({reviewsCount:-1,rating:-1}).limit(4).toArray();
+        res.send(products)
       }
       catch(err){
         console.log(err);
@@ -67,6 +111,7 @@ async function run() {
     app.get("/product-detels/:id",async(req,res)=>{
       try{
         const id=req.params.id;
+
         const product=await productcollection.findOne({_id:new ObjectId(id)})
         if(!product){
           return res.status(404).json({error:"product not found"});
