@@ -25,6 +25,7 @@ async function run() {
     const productcollection = db.collection("products");
     const categoriecollection = db.collection("categories");
     const cartcollection = db.collection("cart");
+    const ordercollection=db.collection("order")
 
     app.get('/categories', async (req, res) => {
       const categories = await categoriecollection.find().toArray();
@@ -36,6 +37,12 @@ async function run() {
       await cartcollection.insertOne(cart);
       res.status(201).json({ message: "Product added" });
     });
+
+    app.post("/order",async(req,res)=>{
+      const order=req.body;
+      await ordercollection.insertOne(order);
+      res.status(201).json({message:"order successfull"})
+    })
 
     app.get("/cart", async (req, res) => {
       const carts = await cartcollection.find().toArray();
