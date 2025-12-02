@@ -103,21 +103,22 @@ async function run() {
       }
     });
 
-    app.delete("/cart/:id", async (req, res) => {
-      try {
-        const id = req.params.id.trim();
-        if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid ID" });
 
-        const result = await cartcollection.deleteOne({ _id: new ObjectId(id) });
 
-        if (result.deletedCount === 0)
-          return res.status(404).json({ message: "Product not found in cart" });
+app.delete("/cart/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await cartcollection.deleteOne({ _id:id });
+    if (result.deletedCount === 1) {
+      res.send({ success: true, message: "Cart item deleted successfully" });
+    } else {
+      res.status(404).send({ success: false, message: "Cart item not found" });
+    }
+  } catch (err) {
+    res.status(500).send({ success: false, message: "Error deleting product", error: err });
+  }
+});
 
-        res.json({ message: "Product deleted successfully" });
-      } catch (error) {
-        res.status(500).json({ message: "Delete failed" });
-      }
-    });
 
     app.get("/products", async (req, res) => {
       try {
