@@ -26,6 +26,22 @@ async function run() {
     const categoriecollection = db.collection("categories");
     const cartcollection = db.collection("cart");
     const ordercollection = db.collection("order");
+    const sellercollection=db.collection("seller-account")
+
+
+    app.post("/sellers",async(req,res)=>{
+      try{
+        const seller=req.body;
+        seller.createdAt=new Date();
+        const reslt=await sellercollection.insertOne(seller);
+        res.status(201).json({
+          message:"seller account create successfully"
+        })
+      }
+      catch(err){
+        res.status(500).json({message:"server error"})
+      }
+    })
 
     app.get('/categories', async (req, res) => {
       try {
