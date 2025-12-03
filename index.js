@@ -43,6 +43,17 @@ async function run() {
       }
     })
 
+
+    app.get("/seller",async(req,res)=>{
+      try{
+        const seller=await sellercollection.find().toArray();
+        res.send(seller);
+      }
+      catch(err){
+        res.status(500).json({message:"server error"})
+      }
+    })
+
     app.get('/categories', async (req, res) => {
       try {
         const categories = await categoriecollection.find().toArray();
@@ -56,9 +67,9 @@ async function run() {
       try {
         const cart = req.body;
         const result = await cartcollection.insertOne(cart);
-        res.status(201).json({ message: "Product added", insertedId: result.insertedId });
+        res.status(201).json({ message: "cart added", insertedId: result.insertedId });
       } catch (error) {
-        res.status(500).json({ message: "Failed to add product" });
+        res.status(500).json({ message: "Failed to add cart" });
       }
     });
 
@@ -155,6 +166,22 @@ app.delete("/cart/:id", async (req, res) => {
         res.status(500).json({ message: "Failed to load products" });
       }
     });
+
+
+    app.post("/products",async(req,res)=>{
+      try{
+        const product=req.body;
+        const result=await productcollection.insertOne(product);
+        res.status(201).json({message:"product added"})
+      }
+      catch(err){
+        res.status(500).json({message:"server error"})
+      }
+    })
+
+
+
+    
 
     app.get("/top-rated-products", async (req, res) => {
       try {
