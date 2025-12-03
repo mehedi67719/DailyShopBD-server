@@ -168,6 +168,38 @@ app.delete("/cart/:id", async (req, res) => {
     });
 
 
+    app.get("/all-products",async(req,res)=>{
+      try{
+        const products=await productcollection.find().toArray();
+        res.send(products)
+      }
+      catch(err){
+        res.status(500).json({message:"server error"})
+      }
+    })
+
+
+    app.delete("/all-products/:id",async(req,res)=>{
+      const id=req.params.id;
+      try{
+        const result=await productcollection.deleteOne({_id:new ObjectId(id)})
+        if(result.deletedCount===1){
+        res.send({success: true, message: "Product deleted successfully"})
+
+        }
+        else{
+        res.status(404).send({success: false, message: "Product not found"})
+        }
+        }
+       catch(err){
+      res.status(500).send({ success: false, message: "Error deleting product", error });
+       }
+      }
+    )
+
+
+
+
     app.post("/products",async(req,res)=>{
       try{
         const product=req.body;
@@ -181,7 +213,7 @@ app.delete("/cart/:id", async (req, res) => {
 
 
 
-    
+
 
     app.get("/top-rated-products", async (req, res) => {
       try {
