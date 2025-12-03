@@ -16,7 +16,9 @@ const client = new MongoClient(uri, {
 });
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+   origin: "*" 
+}));
 
 async function run() {
   try {
