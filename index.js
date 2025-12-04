@@ -20,7 +20,7 @@ app.use(cors());
 
 async function run() {
   try {
-    // await client.connect();
+    await client.connect();
     const db = client.db("dailyshop");
     const productcollection = db.collection("products");
     const categoriecollection = db.collection("categories");
@@ -238,8 +238,8 @@ app.delete("/cart/:id", async (req, res) => {
       }
     });
 
-    // await client.db("admin").command({ ping: 1 });
-    // console.log("Connected to MongoDB");
+    await client.db("admin").command({ ping: 1 });
+    console.log("Connected to MongoDB");
   } catch (error) {
     console.error("MongoDB connection error:", error);
   }
@@ -253,3 +253,5 @@ app.get('/', (req, res) => {
 // app.listen(port, () => {
 //   console.log(`Server running on port ${port}`);
 // });
+
+module.exports = app;
